@@ -1,22 +1,34 @@
-FROM golang:alpine as builder
+# Build stage
+FROM --platform=linux/arm64 golang:alpine as builder
 
 RUN apk update && apk upgrade && apk add --no-cache curl git
 
 RUN curl -s https://raw.githubusercontent.com/eficode/wait-for/master/wait-for -o /usr/bin/wait-for
 RUN chmod +x /usr/bin/wait-for
 
-RUN go get github.com/prep/pubsubc
+RUN go install github.com/prep/pubsubc@latest
 
 ###############################################################################
 
-FROM google/cloud-sdk:alpine
+# Final stage using debian base image for compatibility
+FROM --platform=linux/arm64 debian:bullseye-slim
+
+# Install required dependencies manually
+RUN apt-get update && apt-get install -y \
+    openjdk-11-jre-headless \
+    netcat \
+    curl \
+    gnupg \
+    python3 && \
+    curl -sSL https://sdk.cloud.google.com | bash && \
+    /root/google-cloud-sdk/install.sh --quiet && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/bin/wait-for /usr/bin
 COPY --from=builder /go/bin/pubsubc   /usr/bin
 COPY                run.sh            /run.sh
 
-RUN apk --update add openjdk8-jre netcat-openbsd && gcloud components install beta pubsub-emulator
-
 EXPOSE 8681
 
-CMD /run.sh
+CMD ["/bin/bash", "/run.sh"]
