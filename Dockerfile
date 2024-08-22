@@ -1,5 +1,5 @@
 # Build stage
-FROM --platform=linux/arm64 golang:alpine as builder
+FROM golang:alpine as builder
 
 RUN apk update && apk upgrade && apk add --no-cache curl git
 
