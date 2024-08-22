@@ -22,8 +22,12 @@ RUN apt-get update && apt-get install -y \
     python3 && \
     curl -sSL https://sdk.cloud.google.com | bash && \
     /root/google-cloud-sdk/install.sh --quiet && \
+    /root/google-cloud-sdk/bin/gcloud components install beta --quiet && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Add gcloud to PATH
+ENV PATH=$PATH:/root/google-cloud-sdk/bin
 
 COPY --from=builder /usr/bin/wait-for /usr/bin
 COPY --from=builder /go/bin/pubsubc   /usr/bin
