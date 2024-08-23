@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:alpine as builder
+FROM --platform=$BUILDPLATFORM golang:alpine as builder
 
 RUN apk update && apk upgrade && apk add --no-cache curl git
 
@@ -11,7 +11,7 @@ RUN go install github.com/prep/pubsubc@latest
 ###############################################################################
 
 # Final stage using debian base image for compatibility
-FROM --platform=linux/arm64 debian:bullseye-slim
+FROM --platform=$BUILDPLATFORM debian:bullseye-slim
 
 # Install required dependencies manually
 RUN apt-get update && apt-get install -y \
