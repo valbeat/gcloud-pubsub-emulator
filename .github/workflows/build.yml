@@ -26,4 +26,4 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: $${{ vars.DOCKERHUB_USERNAME }}/gcloud-pubsub-emulator:latest
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/gcloud-pubsub-emulator:latest
